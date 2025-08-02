@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de MTA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #edfcf9;
+      font-family: Helvetica, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 80px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: #10357F;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    button {
+      background-color: #10357F;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #0a2c5c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Calculadora de MTA</h2>
+    <label for="inputMacMTA">Ingresa una dirección MAC:</label>
+    <input type="text" id="inputMacMTA" placeholder="Ej. aa:bb:cc:dd:ee:ff">
+
+    <label for="outputMTA">MTA calculada:</label>
+    <input type="text" id="outputMTA" readonly>
+
+    <div class="buttons">
+      <button onclick="calcularYMostrarMTA()">Calcular</button>
+      <button onclick="limpiarMTA()">Limpiar</button>
+    </div>
+  </div>
+
+  <script>
+    function macToSvFormat(mac) {
+      mac = mac.toLowerCase().replace(/[:\-\.]/g, '');
+      if (!/^[0-9a-f]{12}$/.test(mac)) return null;
+      return 'sv' + mac;
+    }
+
+    function calcularMTA(svMac) {
+      if (!/^sv[0-9a-f]{12}$/.test(svMac)) return null;
+
+      let hex = svMac.slice(2);
+      let hexArray = hex.split('');
+
+      for (let i = hexArray.length - 1; i >= 0; i--) {
+        if (hexArray[i] === 'f') {
+          hexArray[i] = '0';
+        } else {
+          hexArray[i] = (parseInt(hexArray[i], 16) + 1).toString(16);
+          break;
+        }
+      }
+
+      return 'sv' + hexArray.join('');
+    }
+
+    function calcularYMostrarMTA() {
+      const input = document.getElementById('inputMacMTA').value.trim();
+      const svMac = macToSvFormat(input);
+
+      if (!svMac) {
+        alert("MAC inválida. Verifica el formato.");
+        return;
+      }
+
+      const mta = calcularMTA(svMac);
+      if (mta) {
+        document.getElementById('outputMTA').value = mta;
+      } else {
+        alert("No se pudo calcular la MTA.");
+      }
+    }
+
+    function limpiarMTA() {
+      document.getElementById('inputMacMTA').value = '';
+      document.getElementById('outputMTA').value = '';
+    }
+  </script>
+</body>
+</html>
